@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style>
+    body {
+        margin-top: 10px;
+        margin-left: 50px;
+    }
+
+    #link_button {
+        margin-top: 10px;
+        margin-bottom: 20px;
+    }
+
+    #account_input {
+        width: 50%;
+    }
+
+    table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    /* width: 100%; */
+    }
+
+    th, td {
+    text-align: left;
+    padding: 4px;
+    }
+
+    tr:nth-child(even) {
+    background-color: #f2f2f2;
+    }
+
+    th {
+    background-color: orange;
+    color: white;
+    }
+
+    tr:hover {background-color:lightblue;}
+</style>
+
+</head>
+<body><h1>HCTAX Link Converter</h1>
+
+<script>
+var encrypted_number, url;
+var final_links = [];
+
+function get_links() 
+{
+    // Create Array from Text Area Input by separating values by comma
+    var array_from_textArea = document.getElementById("account_input").value.split(',');
+    document.getElementById("number_of_items").innerHTML += array_from_textArea.length;
+    // Iterate overeach item in array from Texas Area Input
+    array_from_textArea.forEach(encrypt_and_go);
+}
+
+function encrypt_and_go(account) 
+{
+    var request = new XMLHttpRequest();
+        request.onreadystatechange = function()
+        {
+            if (this.readyState == 4 && this.status == 200) 
+            {
+                encrypted_number = this.responseText;
+                url = "http://www.hctax.net/Property/TaxStatement?account=" + encrypted_number;
+                // final_links.push(account+": "+url);
+
+                table = document.getElementById("table");
+                // create a new row
+                var newRow = table.insertRow(1);
+                // create a new cell
+                var cellacc = newRow.insertCell(0);
+                var cellurl = newRow.insertCell(1);
+                // add value to the cell
+                cellacc.innerHTML = account;
+                cellurl.innerHTML = url;
+            }
+        }
+        request.open('GET', 'http://www.hctax.net/Property/AccountEncrypt?account=' + account);
+        request.send();
+}
+
+</script>    
+Enter Account Numbers:
+<textarea class="form-control" rows="5" id="account_input"></textarea>
+<button id="link_button" class="btn btn-primary" onclick="get_links()">Get Links</button>
+<p style="color:black;" id="number_of_items">Number of items: </p>
+
+<table id="table">
+    <!-- The Row Number 0 -->
+    <tr>
+        <th>Account</th>
+        <th>URL</th>
+    </tr>
+</table>
+
+</body>
+</html>
